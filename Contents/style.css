@@ -1,7 +1,3 @@
-@font-face {
-    font-family: 'Agent Orange';
-    src: url("../Assets/AGENTORANGE.woff2") format('woff2');
-}
 #gameWindow{
     background-color: #CCD1D1;
     margin: 0 calc((99% - 1000px)/2);

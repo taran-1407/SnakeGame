@@ -4,9 +4,8 @@ const gameWindowContext = gameWindow.getContext("2d");
 const scoreWindowContext = scoreWindow.getContext("2d");
 const gameWindowWidth = 1000, gameWindowHeight = 500, size = 50, roundRadius = 7;
 const scoreWindowWidth = 1000, scoreWindowHeight = 500;
-const scoreFont = "Comic Sans MS";
-const gameFont = "Agent Orange";
-gameWindowContext.width = window.innerWidth;
+const scoreFont = "Fira Mono, Cursive";
+const gameFont = "Bungee Inline, Cursive";
 
 const timeOut = 200;
 const giftGain = 100, moveGain = 5;
@@ -44,6 +43,10 @@ function playSound(file){
     let audio = document.createElement('audio');
     audio.src = file;
     audio.play()
+}
+
+function fontString(fontName, bold, size){
+    return (bold === true?"Bold ":"") + size+"px "+fontName;
 }
 
 function gaussianBlur(canvasImageData, blurRadius, sigma){
@@ -144,7 +147,7 @@ class Game{
         this.direction = 'L';
         this.newDirection = null;
         this.giftCaptured = null;
-        this.score = 0
+        this.score = 0;
 
         this.snakeBody.push(new SquareBlock(gameWindowWidth/2, gameWindowHeight/2, headColorString));
         for(let i = 1; i<= startWithBlocks; i++)this.snakeBody.push(new SquareBlock(gameWindowWidth/2+i*size, gameWindowHeight/2, tailColorString));
@@ -239,10 +242,10 @@ class Game{
     paintOnCanvas(){
         this.gameWindowContext.clearRect(0, 0, gameWindowWidth, gameWindowHeight);
         this.scoreWindowContext.clearRect(0, 0, scoreWindowWidth, scoreWindowHeight);
-        this.scoreWindowContext.font = "bold 30px "+scoreFont;
+        this.scoreWindowContext.font = fontString(scoreFont, true, 30);
         this.scoreWindowContext.fillStyle = "#FFFFFF";
         this.scoreWindowContext.textAlign = "start";
-        this.scoreWindowContext.fillText("HighScore:", 10, 35);
+        this.scoreWindowContext.fillText("High Score:", 10, 35);
         this.scoreWindowContext.fillText("Current Score:", scoreWindowWidth/2+10, 35);
 
         this.scoreWindowContext.textAlign = "end";
@@ -257,9 +260,9 @@ class Game{
         this.gameWindowContext.putImageData(blurredImageData, 0, 0);
         this.gameWindowContext.fillStyle = "#000000";
         this.gameWindowContext.textAlign = "center";
-        this.gameWindowContext.font = "bold 48px "+gameFont;
+        this.gameWindowContext.font = fontString(gameFont, false, 72);
         this.gameWindowContext.fillText("Your Score: "+this.score, gameWindowWidth/2, gameWindowHeight/2-20);
-        this.gameWindowContext.font = "bold 24px "+gameFont;
+        this.gameWindowContext.font = fontString(gameFont, false,36);
         this.gameWindowContext.fillText("Press SpaceBar to play again", gameWindowWidth/2, gameWindowHeight/2+30);
         playSound(GameOverAudio);
     }
@@ -267,12 +270,12 @@ class Game{
 
 let gameState = null;
 let timer = null;
-gameWindowContext.fillStyle = "#000000";
-gameWindowContext.textAlign = "center";
-gameWindowContext.font = "bold 48px "+gameFont;
-gameWindowContext.fillText("The Snake Game", gameWindowWidth/2, gameWindowHeight/2-20);
-gameWindowContext.font = "bold 24px "+gameFont;
-gameWindowContext.fillText("Press SpaceBar to play", gameWindowWidth/2, gameWindowHeight/2+20);
+
+let startPageImage = new Image();
+startPageImage.src = "./Assets/GameStart.jpg";
+startPageImage.onload = () => {
+    gameWindowContext.drawImage(startPageImage, 0, 0);
+}
 
 document.addEventListener('keydown', (event) => {
     let keycode = event.code;
