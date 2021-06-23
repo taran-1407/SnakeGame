@@ -1,11 +1,17 @@
+body{
+    overflow: hidden;
+}
+canvas{
+    display: block;
+}
 #gameWindow{
     background-color: #CCD1D1;
-    margin: 0 calc((99% - 1000px)/2);
     border: 3px solid black;
+    margin: 1% auto;
 }
 #scoreWindow{
     background-color: black;
     color: white;
     border: 3px solid black;
-    margin: 1% calc((99% - 1000px)/2);
+    margin: 0 auto;
 }
