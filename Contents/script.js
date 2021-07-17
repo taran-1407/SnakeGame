@@ -38,15 +38,15 @@ delta['D'] = [0, blockSize]
 let windowResize = function(windowWidth, windowHeight, blockSize){
 
     if(windowHeight < 400 || windowWidth < 800){
-        gameWindow.width = 0;
-        gameWindow.height = 0;
-        scoreWindow.width = 0;
-        scoreWindow.height = 0;
+        scoreWindow.style.display = "none";
+        gameWindow.style.display = "none";
         document.getElementById("loading").style.display = "none";
         document.getElementById("error-message").style.display = "block";
         throw new Error("Too Small Screen Size");
     }
     document.getElementById("error-message").style.display = "None";
+    scoreWindow.style.display = "block";
+    gameWindow.style.display = "block";
 
     scoreWindowWidth = windowWidth;
     scoreWindowHeight = Math.max(50, windowHeight/11);
@@ -66,12 +66,8 @@ let windowResize = function(windowWidth, windowHeight, blockSize){
         gameObject.display();
     }
 }
-window.onresize = function(){
-    window.location.reload();
-}
+window.onresize = function(){window.location.reload();}
 windowResize(windowWidth, windowHeight, blockSize);
-
-
 
 
 function boxBlur(canvasImageData, blurRadius){

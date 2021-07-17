@@ -12,11 +12,13 @@ canvas{
 #gameWindow{
     background-color: #CCD1D1;
     border: 3px solid black;
+    display: none;
 }
 #scoreWindow{
     background-color: black;
     color: white;
     border: 3px solid black;
+    display: none;
 }
 #error-message{
     text-align: center;
@@ -26,18 +28,14 @@ canvas{
     padding: 10px;
     font-size: 30px;
     font-weight: bold;
+    display: none;
 }
 
 #loading {
-    /*background: url("/Assets/loading.gif") no-repeat center center;*/
     position: absolute;
     width: 120px;
     height: 120px;
     top: calc(50% - 60px);
     left: calc(50% - 60px);
-    /*top: 0;*/
-    /*left: 0;*/
-    /*height: 100%;*/
-    /*width: 100%;*/
     z-index: 9999999;
 }
