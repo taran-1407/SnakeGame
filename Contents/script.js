@@ -37,7 +37,7 @@ delta['D'] = [0, blockSize]
 
 let windowResize = function(windowWidth, windowHeight, blockSize){
 
-    if(windowHeight < 400 || windowWidth < 800){
+    if(windowHeight < 400 || windowWidth < 1000){
         scoreWindow.style.display = "none";
         gameWindow.style.display = "none";
         document.getElementById("loading").style.display = "none";
@@ -173,7 +173,6 @@ class Game{
         this.score = 0;
         let x = Math.floor(gameWindowWidth/(2*blockSize)) * blockSize, y = Math.floor(gameWindowHeight/(2*blockSize))*blockSize
         this.snakeBody.push(new SquareBlock(x, y, headColorString));
-        console.log(x+" "+y);
         for(let i = 1; i<= startWithBlocks; i++)this.snakeBody.push(new SquareBlock(x+i*blockSize, y, tailColorString));
         this.generateFood();
     }
@@ -290,7 +289,7 @@ class Game{
         this.scoreWindowContext.textBaseline = "middle";
         this.scoreWindowContext.fillStyle = "#FFFFFF";
 
-        let margin = 10, timerWidth = 0;
+        let margin = 20, timerWidth = 0;
         let width = scoreWindowWidth-2*margin, height = scoreWindowHeight;
 
         if(this.timed){
@@ -300,15 +299,14 @@ class Game{
             timerWidth = this.scoreWindowContext.measureText(timerText).width;
             this.scoreWindowContext.fillText(timerText, margin+width/2, height/2, timerWidth);
         }
+        let currentScoreString = "Current Score:" + (""+this.score).padStart(6);
+        let highScoreString = "High Score:" + (""+Game.highScore).padStart(6);
 
         this.scoreWindowContext.font = fontString(scoreFont, true, 30);
         this.scoreWindowContext.textAlign = "start";
-        this.scoreWindowContext.fillText("High Score:", margin, height/2);
-        this.scoreWindowContext.fillText("Current Score:", margin + (width+timerWidth)/2+margin, height/2);
-
+        this.scoreWindowContext.fillText(highScoreString, margin, height/2);
         this.scoreWindowContext.textAlign = "end";
-        this.scoreWindowContext.fillText(""+Game.highScore, margin + (width-timerWidth)/2-margin, height/2);
-        this.scoreWindowContext.fillText(this.score, margin+width, height/2);
+        this.scoreWindowContext.fillText(currentScoreString, margin+width, height/2);
 
         this.snakeBody.forEach((block) => this.displayObject(block));
         this.displayObject(this.food);
