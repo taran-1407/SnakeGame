@@ -66,9 +66,9 @@ let windowResize = function(windowWidth, windowHeight, blockSize){
         gameObject.display();
     }
 }
+
 window.onresize = function(){window.location.reload();}
 windowResize(windowWidth, windowHeight, blockSize);
-
 
 function boxBlur(canvasImageData, blurRadius){
     let width = canvasImageData.width, height = canvasImageData.height;
@@ -149,12 +149,14 @@ class SquareBlock{
 
 class Game{
     static highScore = 0;
+    static HIGHSCORE_KEYS = {1: "FreeHighScore", 2: "TimedHighScore"};
     static STATUS = {"START": 1, "OVER": 2,"CHOICE": 3, "RUNNING": 4};
+    static MODE = {"FREE": 1, "TIMED": 2};
     constructor(gameWindowContext, scoreWindowContext) {
         this.gameWindowContext = gameWindowContext;
         this.scoreWindowContext = scoreWindowContext;
         this.status = null;
-        this.timed = false;
+        this.mode = 0;
         this.snakeBody = [];
         this.food = null
         this.foodTimeRemaining = gameTimer*1000;
@@ -163,7 +165,7 @@ class Game{
     resetGame(){
         this.status = Game.STATUS.START;
         this.snakeBody = [];
-        this.timed = false;
+        this.mode = 0;
         this.food = null
         this.foodTime = gameTimer*1000;
         this.foodTimeRemaining = this.foodTime;
@@ -176,9 +178,22 @@ class Game{
         for(let i = 1; i<= startWithBlocks; i++)this.snakeBody.push(new SquareBlock(x+i*blockSize, y, tailColorString));
         this.generateFood();
     }
+    setGameMode(mode){
+        this.mode = mode;
+        this.fetchHighScore();
+    }
     incrementScore(gain){
         this.score += gain;
+    }
+    fetchHighScore(){
+        let keyName = Game.HIGHSCORE_KEYS[this.mode];
+        let highScore = localStorage.getItem(keyName);
+        if(highScore === null)Game.highScore = 0;
+        else Game.highScore = parseInt(highScore);
+    }
+    updateHighScore(){
         Game.highScore = Math.max(Game.highScore, this.score);
+        localStorage.setItem(Game.HIGHSCORE_KEYS[this.mode], Game.highScore.toString());
     }
     generateFood(){
         let randInt = (upto) => Math.floor(Math.random()*upto);
@@ -190,7 +205,7 @@ class Game{
             duplicate = this.snakeBody.find((block) => block.samePosition(food));
         }while (duplicate !== undefined);
         this.food = new SquareBlock(x, y, foodColorString);
-        if(this.timed){
+        if(this.mode === Game.MODE.TIMED){
             this.foodTimeRemaining = this.foodTime;
             this.foodTime += gameTimerIncrement;
         }
@@ -237,7 +252,7 @@ class Game{
             return false;
         }
 
-        if(this.timed && this.food !== null && this.foodTimeRemaining === 0 && !this.food.samePosition(nxt)){
+        if(this.mode === Game.MODE.TIMED && this.food !== null && this.foodTimeRemaining === 0 && !this.food.samePosition(nxt)){
             this.food.setColor(foodNotCapturedColorString);
             this.displayGameRunning();
             return false;
@@ -275,24 +290,14 @@ class Game{
         this.gameWindowContext.clearRect(0, 0, gameWindowWidth, gameWindowHeight);
         this.scoreWindowContext.clearRect(0, 0, scoreWindowWidth, scoreWindowHeight);
     }
-    display(){
-        switch (this.status){
-            case Game.STATUS.START: this.displayGameStart();return;
-            case Game.STATUS.CHOICE: this.displayChoice(); return;
-            case Game.STATUS.RUNNING: this.displayGameRunning(); return;
-            case Game.STATUS.OVER: this.displayGameOver(); return;
-            default: console.log("Invalid Game Status")
-        }
-    }
-    displayGameRunning(){
-        this.clearContexts();
+    displayScoreWindow(){
         this.scoreWindowContext.textBaseline = "middle";
         this.scoreWindowContext.fillStyle = "#FFFFFF";
 
         let margin = 20, timerWidth = 0;
         let width = scoreWindowWidth-2*margin, height = scoreWindowHeight;
 
-        if(this.timed){
+        if(this.mode === Game.MODE.TIMED){
             this.scoreWindowContext.font = fontString(scoreFont, true, 48);
             this.scoreWindowContext.textAlign = "center";
             let timerText = "" + (this.foodTimeRemaining / 1000).toFixed(1);
@@ -307,6 +312,19 @@ class Game{
         this.scoreWindowContext.fillText(highScoreString, margin, height/2);
         this.scoreWindowContext.textAlign = "end";
         this.scoreWindowContext.fillText(currentScoreString, margin+width, height/2);
+    }
+    display(){
+        switch (this.status){
+            case Game.STATUS.START: this.displayGameStart();return;
+            case Game.STATUS.CHOICE: this.displayChoice(); return;
+            case Game.STATUS.RUNNING: this.displayGameRunning(); return;
+            case Game.STATUS.OVER: this.displayGameOver(); return;
+            default: console.log("Invalid Game Status")
+        }
+    }
+    displayGameRunning(){
+        this.clearContexts();
+        this.displayScoreWindow();
 
         this.snakeBody.forEach((block) => this.displayObject(block));
         this.displayObject(this.food);
@@ -332,6 +350,8 @@ class Game{
     }
     displayGameOver(){
         let imageData = this.gameWindowContext.getImageData(0, 0, gameWindowWidth, gameWindowHeight);
+        this.clearContexts();
+        this.displayScoreWindow();
         let blurredImageData = blurImage(imageData);
         this.gameWindowContext.putImageData(blurredImageData, 0, 0);
         this.gameWindowContext.fillStyle = "#000000";
@@ -367,8 +387,8 @@ setTimeout(function (){
                 break;
             case Game.STATUS.CHOICE:
                 if(keycode === "KeyF" || keycode === "KeyT"){
-                    if(keycode === "KeyF")gameObject.timed = false;
-                    if(keycode === "KeyT")gameObject.timed = true;
+                    if(keycode === "KeyF")gameObject.setGameMode(Game.MODE.FREE);
+                    if(keycode === "KeyT")gameObject.setGameMode(Game.MODE.TIMED);
 
                     gameObject.status = Game.STATUS.RUNNING;
                     timer = setInterval(function(){
@@ -376,6 +396,7 @@ setTimeout(function (){
                             gameObject.display();
                         }else{
                             clearInterval(timer);
+                            gameObject.updateHighScore();
                             gameObject.status = Game.STATUS.OVER;
                             gameObject.display();
                             playSound(GameOverAudio);
