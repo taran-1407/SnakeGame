@@ -20,7 +20,7 @@ canvas{
     border: 3px solid black;
     display: none;
 }
-#error-message{
+#window-size-error-message{
     text-align: center;
     color: red;
     width: 80%;

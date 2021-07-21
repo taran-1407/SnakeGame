@@ -22,31 +22,27 @@ const KeyPressAudio = "./Assets/KeyPress.mp3";
 const GameOverAudio = "./Assets/GameOver.mp3"
 const CaptureAudio = "./Assets/Capture.mp3";
 
-
 const headColorString = "#1F618D"
 const tailColorString = "#2980B9"
 const borderColorString = "#FFFFFF";
 const foodColorString = "#85C1E9";
 const foodNotCapturedColorString = "#FF0000";
 
-const delta = new Map()
-delta['L'] = [-blockSize, 0]
-delta['R'] = [blockSize, 0]
-delta['U'] = [0, -blockSize]
-delta['D'] = [0, blockSize]
+const delta = new Map();
+delta.set('L', [-blockSize, 0]);
+delta.set('R', [blockSize, 0]);
+delta.set('U', [0, -blockSize]);
+delta.set('D', [0, blockSize]);
 
-let windowResize = function(windowWidth, windowHeight, blockSize){
+function displayWindowSizeError(){
+    scoreWindow.style.display = "none";
+    gameWindow.style.display = "none";
+    document.getElementById("loading").style.display = "none";
+    document.getElementById("window-size-error-message").style.display = "block";
+}
 
-    if(windowHeight < 400 || windowWidth < 1000){
-        scoreWindow.style.display = "none";
-        gameWindow.style.display = "none";
-        document.getElementById("loading").style.display = "none";
-        document.getElementById("error-message").style.display = "block";
-        throw new Error("Too Small Screen Size");
-    }
-    document.getElementById("error-message").style.display = "None";
-    scoreWindow.style.display = "block";
-    gameWindow.style.display = "block";
+function validWindowSize(windowWidth, windowHeight, blockSize){
+    if(windowHeight < 400 || windowWidth < 1000)return false;
 
     scoreWindowWidth = windowWidth;
     scoreWindowHeight = Math.max(50, windowHeight/11);
@@ -65,10 +61,10 @@ let windowResize = function(windowWidth, windowHeight, blockSize){
         gameObject.resetGame();
         gameObject.display();
     }
+    return true;
 }
 
-window.onresize = function(){window.location.reload();}
-windowResize(windowWidth, windowHeight, blockSize);
+
 
 function boxBlur(canvasImageData, blurRadius){
     let width = canvasImageData.width, height = canvasImageData.height;
@@ -236,7 +232,7 @@ class Game{
     performMove(){
         this.loadDirection();
         let updatedPositions = this.snakeBody.map((x) => x.deepCopy());
-        let nxt = new SquareBlock(updatedPositions[0].getMidX()+delta[this.direction][0], updatedPositions[0].getMidY()+delta[this.direction][1], headColorString);
+        let nxt = new SquareBlock(updatedPositions[0].getMidX()+delta.get(this.direction)[0], updatedPositions[0].getMidY()+delta.get(this.direction)[1], headColorString);
 
         updatedPositions[0].setColor(tailColorString)
         if(this.foodCaptured !== null){
@@ -309,9 +305,9 @@ class Game{
 
         this.scoreWindowContext.font = fontString(scoreFont, true, 30);
         this.scoreWindowContext.textAlign = "start";
-        this.scoreWindowContext.fillText(highScoreString, margin, height/2);
+        this.scoreWindowContext.fillText(currentScoreString, margin, height/2);
         this.scoreWindowContext.textAlign = "end";
-        this.scoreWindowContext.fillText(currentScoreString, margin+width, height/2);
+        this.scoreWindowContext.fillText(highScoreString, margin+width, height/2);
     }
     display(){
         switch (this.status){
@@ -363,19 +359,19 @@ class Game{
     }
 }
 
-scoreWindow.style.display = "none";
-gameWindow.style.display = "none";
 
-setTimeout(function (){
+function initializeGame(){
+    document.getElementById("window-size-error-message").style.display = "none";
     document.getElementById("loading").style.display = "none";
     scoreWindow.style.display = "block";
     gameWindow.style.display = "block";
+
+
     gameObject = new Game(gameWindowContext, scoreWindowContext);
     gameObject.resetGame();
     gameObject.status = Game.STATUS.START;
     gameObject.display();
     let timer = null;
-
     document.addEventListener('keydown', (event) => {
         let keycode = event.code;
         switch (gameObject.status){
@@ -417,4 +413,13 @@ setTimeout(function (){
                 break;
         }
     });
-}, 3000);
+
+
+}
+
+window.onresize = function(){window.location.reload();}
+
+if(validWindowSize(windowWidth, windowHeight, blockSize))
+    setTimeout(initializeGame, 3000);
+else
+    displayWindowSizeError();
