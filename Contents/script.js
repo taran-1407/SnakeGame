@@ -14,7 +14,7 @@ let gameObject;
 const scoreFont = "Fira Mono, Cursive";
 const gameFont = "Bungee Inline, Cursive";
 
-const timeOut = 125;
+const timeOut = 200;
 const startWithBlocks = 4;
 
 const KeyPressAudio = "./Assets/KeyPress.mp3";
