@@ -14,7 +14,8 @@ let gameObject;
 const scoreFont = "Fira Mono, Cursive";
 const gameFont = "Bungee Inline, Cursive";
 
-const timeOut = 200;
+const timeOut = 125;
+// const timeOut = 125;
 const startWithBlocks = 4;
 
 const KeyPressAudio = "./Assets/KeyPress.mp3";
@@ -299,7 +300,7 @@ class Game{
         if(this.mode === Game.MODE.TIMED){
             this.scoreWindowContext.font = fontString(scoreFont, true, 48);
             this.scoreWindowContext.textAlign = "center";
-            let timerText = "" + (this.foodTimeRemaining / 1000).toFixed(1);
+            let timerText = "" + (this.foodTimeRemaining / 1000).toFixed(3);
             timerWidth = this.scoreWindowContext.measureText(timerText).width;
             this.scoreWindowContext.fillText(timerText, margin+width/2, height/2, timerWidth);
         }
