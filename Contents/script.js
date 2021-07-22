@@ -8,7 +8,7 @@ const scoreWindowContext = scoreWindow.getContext("2d");
 const windowHeight = window.innerHeight, windowWidth = window.innerWidth;
 const blockSize = 50, roundRadius = 7;
 
-let scoreWindowWidth, scoreWindowHeight, gameWindowWidth, gameWindowHeight, gameWindowHorizontalMargin, gameWindowVerticalMargin;
+let scoreWindowWidth, scoreWindowHeight, gameWindowWidth, gameWindowHeight, gameWindowHorizontalMargin;
 let gameObject;
 
 const scoreFont = "Fira Mono, Cursive";
@@ -49,7 +49,6 @@ function validWindowSize(windowWidth, windowHeight, blockSize){
     gameWindowWidth = windowWidth - windowWidth % blockSize;
     gameWindowHeight = (windowHeight - scoreWindowHeight) - (windowHeight - scoreWindowHeight) % blockSize;
     gameWindowHorizontalMargin = (windowWidth - gameWindowWidth)/2;
-    gameWindowVerticalMargin = (windowHeight-scoreWindowHeight-gameWindowHeight)/2;
 
     gameWindow.width = gameWindowWidth;
     gameWindow.height = gameWindowHeight;
@@ -57,7 +56,6 @@ function validWindowSize(windowWidth, windowHeight, blockSize){
     scoreWindow.height = scoreWindowHeight;
     gameWindow.style.marginLeft = gameWindowHorizontalMargin + "px";
     gameWindow.style.marginRight = gameWindowHorizontalMargin + "px";
-    gameWindow.style.marginTop = gameWindowVerticalMargin + "px";
     if(gameObject !== undefined && gameObject !== null){
         gameObject.resetGame();
         gameObject.display();
