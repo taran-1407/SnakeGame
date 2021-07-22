@@ -14,8 +14,7 @@ let gameObject;
 const scoreFont = "Fira Mono, Cursive";
 const gameFont = "Bungee Inline, Cursive";
 
-const timeOut = 200, gameTimer = 10, gameTimerIncrement = 200;
-const foodGain = 100, moveGain = 5;
+const timeOut = 200;
 const startWithBlocks = 4;
 
 const KeyPressAudio = "./Assets/KeyPress.mp3";
@@ -50,6 +49,7 @@ function validWindowSize(windowWidth, windowHeight, blockSize){
     gameWindowWidth = windowWidth - windowWidth % blockSize;
     gameWindowHeight = (windowHeight - scoreWindowHeight) - (windowHeight - scoreWindowHeight) % blockSize;
     gameWindowHorizontalMargin = (windowWidth - gameWindowWidth)/2;
+    gameWindowVerticalMargin = (windowHeight-scoreWindowHeight-gameWindowHeight)/2;
 
     gameWindow.width = gameWindowWidth;
     gameWindow.height = gameWindowHeight;
@@ -57,6 +57,7 @@ function validWindowSize(windowWidth, windowHeight, blockSize){
     scoreWindow.height = scoreWindowHeight;
     gameWindow.style.marginLeft = gameWindowHorizontalMargin + "px";
     gameWindow.style.marginRight = gameWindowHorizontalMargin + "px";
+    gameWindow.style.marginTop = gameWindowVerticalMargin + "px";
     if(gameObject !== undefined && gameObject !== null){
         gameObject.resetGame();
         gameObject.display();
@@ -145,6 +146,10 @@ class SquareBlock{
 
 class Game{
     static highScore = 0;
+    static foodGain = 100;
+    static moveGain = {1: 0, 2: 5};
+    static gameTimer = 10000;
+    static gameTimerIncrement = timeOut;
     static HIGHSCORE_KEYS = {1: "FreeHighScore", 2: "TimedHighScore"};
     static STATUS = {"START": 1, "OVER": 2,"CHOICE": 3, "RUNNING": 4};
     static MODE = {"FREE": 1, "TIMED": 2};
@@ -155,15 +160,15 @@ class Game{
         this.mode = 0;
         this.snakeBody = [];
         this.food = null
-        this.foodTimeRemaining = gameTimer*1000;
-        this.foodTime = gameTimer;
+        this.foodTimeRemaining = Game.gameTimer;
+        this.foodTime = Game.gameTimer;
     }
     resetGame(){
         this.status = Game.STATUS.START;
         this.snakeBody = [];
         this.mode = 0;
         this.food = null
-        this.foodTime = gameTimer*1000;
+        this.foodTime = Game.gameTimer;
         this.foodTimeRemaining = this.foodTime;
         this.direction = 'L';
         this.newDirection = null;
@@ -203,7 +208,7 @@ class Game{
         this.food = new SquareBlock(x, y, foodColorString);
         if(this.mode === Game.MODE.TIMED){
             this.foodTimeRemaining = this.foodTime;
-            this.foodTime += gameTimerIncrement;
+            this.foodTime += Game.gameTimerIncrement;
         }
     }
     updateDirection(newDirection){
@@ -255,12 +260,12 @@ class Game{
         }
 
         this.foodTimeRemaining -= timeOut;
-        this.incrementScore(moveGain);
+        this.incrementScore(Game.moveGain[this.mode]);
         this.snakeBody = updatedPositions;
         if(this.food.samePosition(nxt)){
             this.foodCaptured = this.food;
             this.food = null;
-            this.incrementScore(foodGain);
+            this.incrementScore(Game.foodGain);
             playSound(CaptureAudio);
             this.generateFood();
         }
